@@ -127,7 +127,7 @@ public:
 	{
 		longint a, b, c;
 
-		// 자리수가 긴걸 a로
+		// 자리수가 긴 string을 a로
 		if(this->s.size() >= x.s.size())
 		{
 			a.s = this->s;
