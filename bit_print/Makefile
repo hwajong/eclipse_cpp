@@ -1,17 +1,19 @@
 CXXFLAGS =	-O2 -g -Wall -fmessage-length=0
 
-TARGET =	q9_9
+q1:
+	$(CXX) -o q1 q1.cpp	
 
-TARGET2 =	q10_4
-
-$(TARGET):	$(TARGET).o
-	$(CXX) -o $(TARGET) $(TARGET).o
+q2:
+	$(CXX) -o q2 q2.cpp
 	
-$(TARGET2):	$(TARGET2).o
-	$(CXX) -o $(TARGET2) $(TARGET2).o
+q3:
+	$(CXX) -o q3 q3.cpp	
+		
+q4:
+	$(CXX) -o q4 q4.cpp	
 	
 
-all:	$(TARGET) $(TARGET2)
+all: clean q1 q2 q3 q4
 
-clean:
-	rm -f $(OBJS) $(TARGET)
+clean: 
+	rm -f q1 q2 q3 q4 *.o
