@@ -2,7 +2,7 @@
 
 using namespace std;
 
-// 8개의 비트값 출력
+// 8개의 비트값 출력.
 void disp_binary(unsigned char c)
 {
 	printf("%3d : ", (int)c);
