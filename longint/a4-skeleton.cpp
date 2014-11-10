@@ -8,6 +8,7 @@
 #include <string>
 #include <cassert>
 #include <cmath>
+#include <stdexcept>
 
 using namespace std;
 
