@@ -1,0 +1,9 @@
+/image_processing.exe
+/histeq_input.raw
+/avr_filter1_lena256.raw
+/avr_filter2_lena256.raw
+/median_filter_lena256_n10.raw
+/median_filter_lena256_n25.raw
+/median_filter_lena256_n5.raw
+/sharpening_filter_lena256.raw
+/smooth_filter_lena256.raw
