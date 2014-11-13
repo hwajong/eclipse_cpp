@@ -38,7 +38,7 @@ void displayText(float x, float y, const char *string)
 	glRasterPos2f(x, y);
 	for(int i = 0; i < j; i++)
 	{
-		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
+		glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, string[i]);
 	}
 }
 
