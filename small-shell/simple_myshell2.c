@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 
 #define MAX_CMD_ARG 10
 #define MAX_CMD_GRP 10
@@ -92,7 +93,7 @@ void check_exit(const char* cmdgrp)
 	}
 }
 
-// 사용자가 입력한 명령이 cd 이면 chmod() 로 디렉토리를 바꾼다.
+// 사용자가 입력한 명령이 cd 이면 chdir() 로 디렉토리를 바꾼다.
 int check_cd(const char* cmdgrp)
 {
 	char buff[BUFSIZ] = {0,};

@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <fcntl.h>
 
 #define MAX_CMD_ARG 10
 #define MAX_CMD_GRP 10
@@ -38,24 +39,14 @@ int makelist(char *s, const char *delimiters, char** list, int MAX_LIST)
 }
 
 // 백그라운드로 명령을 실행한다.
-void background_run()
+void execute_at_background()
 {
-	int pid = fork();
-
 	// 부모 프로세스를 죽이고 고아 프로세스로 만든다.
-	if(pid != 0) exit(0);
+	if(fork() != 0) exit(0);
 
-	switch(pid)
-	{
-	case -1:
-		fatal("fork error");
-		break;
-
-	case 0: // child process
-		execvp(cmdvector[0], cmdvector);
-		fatal("exec error");
-		break;
-	}
+	// child process
+	execvp(cmdvector[0], cmdvector);
+	fatal("exec error");
 }
 
 // 명령어 실행
@@ -68,12 +59,12 @@ void execute_cmdgrp(char *cmdgrp)
 //		printf("cmdvector[%d] :%s\n", i, cmdvector[i]);
 //	}
 
-	int size = strlen(cmdvector[count-1]);
-	if(size > 0 && cmdvector[count-1][size-1] == '&')
+	int size = strlen(cmdvector[count - 1]);
+	if(size > 0 && cmdvector[count - 1][size - 1] == '&')
 	{
-		cmdvector[count-1][size-1] = '\0';
-		if(strlen(cmdvector[count-1]) == 0) cmdvector[count-1] = NULL;
-		background_run();
+		cmdvector[count - 1][size - 1] = '\0';
+		if(strlen(cmdvector[count - 1]) == 0) cmdvector[count - 1] = NULL;
+		execute_at_background();
 		exit(0);
 	}
 
@@ -82,7 +73,7 @@ void execute_cmdgrp(char *cmdgrp)
 }
 
 // exit 명령이면 종료한다.
-void check_exit(const char* cmdgrp)
+void exit_if(const char* cmdgrp)
 {
 	char* s = strdup(cmdgrp);
 	makelist(s, " \t", cmdvector, MAX_CMD_ARG);
@@ -96,8 +87,8 @@ void check_exit(const char* cmdgrp)
 	free(s);
 }
 
-// cd 명령어이면 chmod() 로 디렉토리를 바꾼다.
-int check_cd(const char* cmdgrp)
+// cd 명령어이면 chdir() 로 디렉토리를 바꾼다.
+int chdir_if_cd(const char* cmdgrp)
 {
 	char* s = strdup(cmdgrp);
 	makelist(s, " \t", cmdvector, MAX_CMD_ARG);
@@ -121,12 +112,15 @@ void execute_cmdline(char* cmdline)
 	for(int i = 0; i < count; ++i)
 	{
 		// exit 명령 처리
-		check_exit(cmdgrps[i]);
+		exit_if(cmdgrps[i]);
 
 		// cd 명령 처리
-		if(check_cd(cmdgrps[i])) continue;
+		if(chdir_if_cd(cmdgrps[i])) continue;
 
-		switch(fork())
+		int pid = fork();
+		int status = 0;
+
+		switch(pid)
 		{
 		case -1:
 			fatal("fork error");
@@ -138,7 +132,7 @@ void execute_cmdline(char* cmdline)
 			break;
 
 		default: // parent process
-			wait(NULL);
+			waitpid(pid, &status, 0);
 			fflush(stdout);
 		}
 	}
@@ -155,11 +149,4 @@ int main(int argc, char**argv)
 		execute_cmdline(cmdline);
 	}
 }
-
-
-
-
-
-
-
 
