@@ -1,7 +1,8 @@
 all:
-	gcc -Wall simple_myshell.c
+	gcc -Wall -std=c99 simple_myshell.c -o mysell
+	gcc simple_myshell2.c -o mysell2
 	
 clean:
-	rm -rf a.out
+	rm -rf mysell mysell2
 	
 	

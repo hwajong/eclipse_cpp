@@ -38,7 +38,7 @@ int makelist(char *s, const char *delimiters, char** list, int MAX_LIST)
 }
 
 // 백그라운드로 명령을 실행한다.
-void execute_bg_mode()
+void background_run()
 {
 	int pid = fork();
 
@@ -73,7 +73,7 @@ void execute_cmdgrp(char *cmdgrp)
 	{
 		cmdvector[count-1][size-1] = '\0';
 		if(strlen(cmdvector[count-1]) == 0) cmdvector[count-1] = NULL;
-		execute_bg_mode();
+		background_run();
 		exit(0);
 	}
 
@@ -82,7 +82,7 @@ void execute_cmdgrp(char *cmdgrp)
 }
 
 // exit 명령이면 종료한다.
-void do_if_exit_cmd(const char* cmdgrp)
+void check_exit(const char* cmdgrp)
 {
 	char* s = strdup(cmdgrp);
 	makelist(s, " \t", cmdvector, MAX_CMD_ARG);
@@ -97,7 +97,7 @@ void do_if_exit_cmd(const char* cmdgrp)
 }
 
 // cd 명령어이면 chmod() 로 디렉토리를 바꾼다.
-int do_if_cd_cmd(const char* cmdgrp)
+int check_cd(const char* cmdgrp)
 {
 	char* s = strdup(cmdgrp);
 	makelist(s, " \t", cmdvector, MAX_CMD_ARG);
@@ -121,10 +121,10 @@ void execute_cmdline(char* cmdline)
 	for(int i = 0; i < count; ++i)
 	{
 		// exit 명령 처리
-		do_if_exit_cmd(cmdgrps[i]);
+		check_exit(cmdgrps[i]);
 
 		// cd 명령 처리
-		if(do_if_cd_cmd(cmdgrps[i])) continue;
+		if(check_cd(cmdgrps[i])) continue;
 
 		switch(fork())
 		{
