@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <libgen.h>
+#include <ctype.h>
 #include "common.h"
 
 #define MAX_WORD_TABLE_LEN 30
@@ -17,6 +18,20 @@ int word_freq_table_size = 0;
 
 bst_node* obst = NULL;
 bst_node* fbst = NULL;
+
+// 문자열의 앞뒤 공백을 제거한다.
+void trim(char* s)
+{
+	char *p = s;
+	int l = strlen(p);
+
+	while(isspace(p[l - 1]))
+		p[--l] = 0;
+	while(*p && isspace(*p))
+		++p, --l;
+
+	memmove(s, p, l + 1);
+}
 
 void print_word_freq_table()
 {
@@ -119,14 +134,11 @@ void make_fbst()
 	{
 		fbst = insert_node(fbst, word_freq_table[i].word);
 	}
-
 }
 
-void encode(bst_node* root, const char* msg)
+void encode(bst_node* root, const char* msg, const char* desc)
 {
-	//printf("*msg : %s\n", msg);
-
-	printf("*Encoded Msg\n");
+	printf("*%s\n", desc);
 
 	char* msg_cp = strdup(msg);
 	char* p = strtok(msg_cp, " ");
@@ -183,21 +195,47 @@ int main(int argc, char** argv)
 	//const char* msg = "crocodile koala crocodile koala leopard octopus lion koala shark leopard koala weasel crocodile leopard lama koala";
 	const char* fname_logfile = argv[1];
 	const char* fname_msgfile = argv[2];
-	char msg[1024];
-	load_msg(fname_msgfile, msg);
 
 	load_word_freq(fname_logfile);
 
 	make_obst();
 	make_fbst();
 
-	printf("*original msg : %s\n", msg);
+	FILE* fp = fopen(fname_msgfile, "r");
+	if(fp == NULL)
+	{
+		fprintf(stderr, "** Error : fail to read msgfile - %s\n", fname_msgfile);
+		exit(-1);
+	}
 
-	encode(obst, msg);
-	encode(fbst, msg);
+	char line[1024];
+	while(fgets(line, sizeof(line), fp) != NULL)
+	{
+		trim(line);
+		if(strlen(line) == 0) continue;
+
+		// printf("*original xxx : %s\n", line);
+		char msg[1024] =
+		{ 0, };
+		char word[MAX_WORD_LEN];
+		int idx = 0;
+		while(sscanf(line + idx, "%s", word) == 1)
+		{
+			//printf("***%s\n", word);
+			strcat(msg, word);
+			strcat(msg, " ");
+			idx += (strlen(word) + 1);
+		}
+
+		printf("\n*Original msg : %s\n", msg);
+
+		encode(obst, msg, "Encoded Msg by OBST");
+		encode(fbst, msg, "Encoded Msg by FBST");
+	}
 
 	cleanup(obst);
 	cleanup(fbst);
 
 	return 0;
 }
+
